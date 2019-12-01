@@ -28,13 +28,17 @@ namespace DatingApp.API.Data
 
         public async Task<User> GetUser(int id)
         {
-            var user = await _context.Users.Include(u => u.Photos).FirstOrDefaultAsync(u => u.Id == id);
+            var user = await _context.Users
+                //.Include(u => u.Photos)
+                .FirstOrDefaultAsync(u => u.Id == id);
             return user;
         }
 
         public async Task<PagedList<User>> GetUsers(UserParams userParams)
         {
-            var users = _context.Users.Include(u => u.Photos).OrderByDescending(u => u.LastActive).AsQueryable();
+            var users = _context.Users
+                //.Include(u => u.Photos)
+                .OrderByDescending(u => u.LastActive).AsQueryable();
 
             users = users.Where(u => u.Id != userParams.UserId);
 
@@ -77,7 +81,9 @@ namespace DatingApp.API.Data
 
         private async Task<IEnumerable<int>> GetUserLikes(int id, bool likers)
         {
-            var user = await _context.Users.Include(u => u.Likers).Include(u => u.Likees).FirstOrDefaultAsync(u => u.Id == id);
+            var user = await _context.Users
+                //.Include(u => u.Likers).Include(u => u.Likees)
+                .FirstOrDefaultAsync(u => u.Id == id);
 
             if(likers)
                 return user.Likers.Where(u => u.LikeeId == id).Select(u => u.LikerId);
@@ -113,9 +119,10 @@ namespace DatingApp.API.Data
 
         public async Task<PagedList<Message>> GetMessagesForUser(MessageParams messageParams)
         {
-            var messages = _context.Messages.Include(u => u.Sender).ThenInclude(p => p.Photos)
-                                            .Include(u => u.Recipient).ThenInclude(p => p.Photos)
-                                            .AsQueryable();
+            var messages = _context.Messages
+                //.Include(u => u.Sender).ThenInclude(p => p.Photos)
+                //.Include(u => u.Recipient).ThenInclude(p => p.Photos)
+                .AsQueryable();
 
             switch(messageParams.MessageContainer)
             {
@@ -137,12 +144,13 @@ namespace DatingApp.API.Data
 
         public async Task<IEnumerable<Message>> GetMessageThread(int userId, int recipientId)
         {
-            var messages = await _context.Messages.Include(u => u.Sender).ThenInclude(p => p.Photos)
-                                            .Include(u => u.Recipient).ThenInclude(p => p.Photos)
-                                            .Where(m => m.SenderId == recipientId && m.RecipientDeleted == false && m.RecipientId == userId 
-                                                     || m.SenderId == userId && m.RecipientId == recipientId && m.SenderDeleted == false)
-                                            .OrderByDescending(m => m.MessageSent)
-                                            .ToListAsync();
+            var messages = await _context.Messages
+                //.Include(u => u.Sender).ThenInclude(p => p.Photos)
+                //.Include(u => u.Recipient).ThenInclude(p => p.Photos)
+                .Where(m => m.SenderId == recipientId && m.RecipientDeleted == false && m.RecipientId == userId 
+                            || m.SenderId == userId && m.RecipientId == recipientId && m.SenderDeleted == false)
+                .OrderByDescending(m => m.MessageSent)
+                .ToListAsync();
                                 
             return messages;
         }

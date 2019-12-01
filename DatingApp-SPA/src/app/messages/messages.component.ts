@@ -14,9 +14,9 @@ import { AlertifyService } from '../_services/alertify.service';
 export class MessagesComponent implements OnInit {
   messages: Message[];
   pagination: Pagination;
-  messageContainer: 'Unread';
+  messageContainer = 'Unread';
 
-  constructor(private userService: UserService, private authService: AuthService, 
+  constructor(private userService: UserService, private authService: AuthService,
               private route: ActivatedRoute, private alertify: AlertifyService) { }
 
   ngOnInit() {
